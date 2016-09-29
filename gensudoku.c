@@ -1,5 +1,6 @@
 #include<stdio.h>
 
+
 void genSudokuBoard(int grid[ ], int display[ ]){
 int i,c, j, rowNum, colNum, blockNum;
 
