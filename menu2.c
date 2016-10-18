@@ -1,9 +1,24 @@
 #include<gtk/gtk.h>
+#include<string.h>
+#include<stdio.h>
+#include<stdlib.h>
 
 
 
 int main(int argc, char *argv[])
 {
+if (argc==1)
+{
+goto loop;
+}
+
+if(strcmp(argv[1], "-h") == 0){
+
+printf("usage: gcc menu2.c `pkg-config --libs gtk+-2.0` `pkg-config --cflags gtk+-2.0`");
+return 0;
+}
+
+loop:
 
 gtk_init(&argc,&argv); //initialize gtk
 GtkWidget *window, *button, *vbox, *menu_bar, *game_menu, *help_menu; //declare widgets variables
@@ -76,7 +91,7 @@ g_signal_connect(G_OBJECT(exitMi), "activate",G_CALLBACK(gtk_main_quit), NULL);
 //howMi=gtk_menu_item_new_with_label("How To Play");             
 //gtk_menu_shell_append(GTK_MENU_SHELL(help_menu),menu_item);
 
-vbox=gtk_box_new(0,0);                                      
+vbox=gtk_vbox_new(0,0);                                      
 gtk_box_pack_start(GTK_BOX(vbox),menu_bar,0,0,0);
 
 gtk_container_add(GTK_CONTAINER(window),vbox);

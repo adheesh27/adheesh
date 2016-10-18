@@ -1,5 +1,6 @@
 #include<stdio.h>
 
+#define N 9
 
 void genSudokuBoard(int grid[ ], int display[ ]){
 int i,c, j, rowNum, colNum, blockNum;
@@ -24,7 +25,10 @@ for(i=0; i<N*N; i++) {  /* displaying all N*N numbers in the 'grid' array */
 }
 printf("\n");
 
-return 0;
+//return 0;
 }
 
+int main(){
+void genSudokuBoard(int grid[ ], int display[ ]);
+}
 
