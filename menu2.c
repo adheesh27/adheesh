@@ -14,7 +14,8 @@ goto loop;
 
 if(strcmp(argv[1], "-h") == 0){
 
-printf("usage: gcc menu2.c `pkg-config --libs gtk+-2.0` `pkg-config --cflags gtk+-2.0`");
+printf("usage: gcc menu2.c `pkg-config --libs gtk+-2.0` `pkg-config --cflags gtk+-2.0` or make and then ./try");
+
 return 0;
 }
 

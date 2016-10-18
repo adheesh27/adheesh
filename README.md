@@ -28,7 +28,8 @@ pkg-config --cflags gtk+-2.0
 
 To run the programme, the following needs to be typed:
 
-gcc ****name of c file**** `pkg-config --libs gtk+-2.0` `pkg-config --cflags gtk+-2.0`
+gcc ****name of c file**** `pkg-config --libs gtk+-2.0` `pkg-config --cflags gtk+-2.0` or use the Makefile
+and complile : make
 
 ### Functions yet to be complete
 
