@@ -104,3 +104,179 @@ return 0;
 }
 //help_menu=gtk_menu_new();
 
+/*gboolean make_sudoku_board(GtkBox *box)
+{
+	GtkWidget *board;           // table in which to place the sudoku squares
+	GtkWidget *frame;           // placed around each sudoku square
+	GtkWidget *vbox;
+	register size_t row;        // sudoku square locations
+	register size_t col;
+
+	// set up table
+	board = gtk_table_new(GRID_SIZE, GRID_SIZE, TRUE);
+	gtk_box_pack_start(GTK_BOX(box), board, TRUE, TRUE, 0);
+	for(row = BLOCK_SIZE-1; row < GRID_SIZE; row += BLOCK_SIZE) {
+		gtk_table_set_row_spacing(GTK_TABLE(board), row, 2);
+		gtk_table_set_col_spacing(GTK_TABLE(board), row, 2);
+	}
+	gtk_widget_show(board);
+
+	// allocate mem for sudoku squares
+	sudoku.square = malloc(GRID_SIZE * sizeof(Square *));
+	if(sudoku.square == NULL) {
+		fputs("  * Out of memory!\n", stderr);
+		return FALSE;
+	}
+	for(row = 0; row < GRID_SIZE; ++row) {
+		sudoku.square[row] = (Square*)malloc(GRID_SIZE * sizeof(Square));
+		if(sudoku.square[row] == NULL) {
+			fputs("  * Out of memory!\n", stderr);
+			return FALSE;
+	} }
+
+	// initialize sudoku squares
+	for(row = 0; row < GRID_SIZE; ++row)
+	for(col = 0; col < GRID_SIZE; ++col) {
+		// set up the bordering frame for each sudoku square
+		frame = gtk_frame_new(NULL);
+		GTK_FRAME(frame)->shadow_type = GTK_SHADOW_IN;
+		gtk_widget_set_size_request(frame, SQUARE_SIZE, SQUARE_SIZE);
+		gtk_table_attach(GTK_TABLE(board), frame, row, row+1, col, col+1,
+				GTK_FILL | GTK_EXPAND, GTK_FILL | GTK_EXPAND, 0, 0);
+		gtk_widget_show(frame);
+
+		// set up the eventbox
+		sudoku.square[row][col].eventbox = gtk_event_box_new();
+		gtk_widget_set_name(sudoku.square[row][col].eventbox, "sudoku_square");
+		gtk_widget_set_events(sudoku.square[row][col].eventbox,
+				GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK);
+		gtk_container_add(GTK_CONTAINER(frame), 
+				sudoku.square[row][col].eventbox);
+
+		// set up vbox
+		vbox = gtk_vbox_new(TRUE, 0);
+		gtk_container_add(
+				GTK_CONTAINER(sudoku.square[row][col].eventbox), vbox);
+		gtk_widget_show(vbox);
+
+		// set up label
+		sudoku.square[row][col].label = gtk_label_new(NULL);
+		gtk_widget_set_name(sudoku.square[row][col].label, "sudoku_label");
+		gtk_box_pack_start(
+				GTK_BOX(vbox), sudoku.square[row][col].label, TRUE, TRUE, 0);
+		gtk_widget_show(sudoku.square[row][col].label);
+
+		// set up the entry
+		sudoku.square[row][col].entry = gtk_entry_new();
+		gtk_widget_set_name(sudoku.square[row][col].entry, "sudoku_entry");
+		gtk_entry_set_has_frame(
+				GTK_ENTRY(sudoku.square[row][col].entry), FALSE);
+		gtk_entry_set_width_chars(GTK_ENTRY(sudoku.square[row][col].entry), 1);
+		gtk_entry_set_max_length(GTK_ENTRY(sudoku.square[row][col].entry), 1);
+		gtk_entry_set_alignment(GTK_ENTRY(sudoku.square[row][col].entry), 0.5);
+		gtk_box_pack_start(GTK_BOX(vbox), sudoku.square[row][col].entry, 
+				TRUE, TRUE, 0);
+
+		// set up signals now that eventbox and entry widgets have been created
+		g_signal_connect(G_OBJECT(sudoku.square[row][col].entry),
+				"backspace", G_CALLBACK(on_backspace), 
+				SUDOKU_SQUARE(&sudoku.square[row][col]));
+		g_signal_connect(G_OBJECT(sudoku.square[row][col].entry), 
+				"insert-text", G_CALLBACK(on_insert), 
+				SUDOKU_SQUARE(&sudoku.square[row][col]));
+		g_signal_connect(G_OBJECT(sudoku.square[row][col].eventbox),
+				"button_press_event", G_CALLBACK(on_click), 
+				SUDOKU_SQUARE(&sudoku.square[row][col]));
+		g_signal_connect(G_OBJECT(sudoku.square[row][col].eventbox), 
+				"enter_notify_event", G_CALLBACK(on_enter), 
+				sudoku.square[row][col].entry);
+		g_signal_connect(G_OBJECT(sudoku.square[row][col].eventbox), 
+				"leave_notify_event", G_CALLBACK(on_leave), 
+				sudoku.square[row][col].entry);
+		g_signal_connect(G_OBJECT(sudoku.square[row][col].entry), 
+				"enter_notify_event", G_CALLBACK(on_enter), 
+				sudoku.square[row][col].eventbox);
+		g_signal_connect(G_OBJECT(sudoku.square[row][col].entry),
+				"leave_notify_event", G_CALLBACK(on_leave), 
+				sudoku.square[row][col].eventbox);
+
+		gtk_widget_show(sudoku.square[row][col].eventbox);
+		// do not show sudoku.square[row][col].entry
+
+		sudoku.square[row][col].editable = TRUE;
+	}
+	// by default no square has focus
+	sudoku.last_square_clicked = NULL;
+	return TRUE;
+}
+
+int main(int argc, char *argv[])
+{
+	/////////////////GdkPixbuf *icon;
+	GError *error = NULL;          // picks up image-loading errors
+	GtkWidget *vbox, *hbox;
+	GtkWidget *eventbox_statusbar; // for customization purposes (thru rc file)
+	GtkWidget *eventbox_hbox;      // also for customization
+	GtkToolItem *done;             // signals that user is done creating puzzle
+
+	g_thread_init(NULL);
+	gtk_init(&argc, &argv);
+
+	//////////////gtk_rc_parse("gtk-sudoku.rc");
+
+	///////////////////icon = gdk_pixbuf_new_from_file("images/sudoku-icon.png", &error);
+	//////////////if(error == NULL)
+		/////////////////regular_or_super_sudoku(icon);
+	//////////else
+		//////////regular_or_super_sudoku(NULL);
+
+	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	g_signal_connect(
+			G_OBJECT(window), "destroy", G_CALLBACK(on_close), NULL);
+	gtk_window_set_title(GTK_WINDOW(window), "gtk-sudoku");
+	if(error == NULL)
+		gtk_window_set_icon(GTK_WINDOW(window), icon);
+
+	vbox = gtk_vbox_new(FALSE, 0);
+	gtk_container_add(GTK_CONTAINER(window), vbox);
+	gtk_widget_show(vbox);
+
+	statusbar = gtk_statusbar_new();
+	done = gtk_tool_button_new_from_stock(GTK_STOCK_JUMP_TO);
+	g_signal_connect(G_OBJECT(done), "clicked",
+			G_CALLBACK(user_done_creating), NULL);
+	gtk_widget_set_sensitive(GTK_WIDGET(done), FALSE);
+	gtk_box_pack_end(GTK_BOX(statusbar), GTK_WIDGET(done), FALSE, FALSE, 0);
+	gtk_widget_show(GTK_WIDGET(done));
+
+	make_toolbar(GTK_BOX(vbox), GTK_WIDGET(done));
+
+	hbox = gtk_hbox_new(FALSE, 0);
+	gtk_container_set_border_width(GTK_CONTAINER(hbox), 6);
+	eventbox_hbox = gtk_event_box_new();
+	gtk_widget_set_name(eventbox_hbox, "board");
+	gtk_container_add(GTK_CONTAINER(eventbox_hbox), hbox);
+	gtk_box_pack_start(GTK_BOX(vbox), eventbox_hbox, TRUE, TRUE, 0);
+	gtk_widget_show(eventbox_hbox);
+	gtk_widget_show(hbox);
+
+	if(!make_sudoku_board(GTK_BOX(hbox))) {
+		gtk_widget_destroy(window);
+		exit(EXIT_FAILURE);
+	}
+
+	eventbox_statusbar = gtk_event_box_new();
+	gtk_widget_set_name(eventbox_statusbar, "statusbar");
+	gtk_container_add(GTK_CONTAINER(eventbox_statusbar), statusbar);
+	gtk_box_pack_start(GTK_BOX(vbox), eventbox_statusbar, TRUE, TRUE, 0);
+	gtk_widget_show(eventbox_statusbar);
+	gtk_widget_show(statusbar);
+
+	gtk_widget_show(window);
+
+	//mutex = g_mutex_new();
+	gtk_main();
+	//g_mutex_free(mutex);
+
+	return 0;
+}*/
